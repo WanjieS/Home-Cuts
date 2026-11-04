@@ -338,17 +338,72 @@ app.post('/api/snacks/reconcile', async (req, res) => {
 });
 
 // ==========================================
-// 6. DUAL M-PESA C2B WEBHOOKS & DASHBOARD
+// 6. SAFARICOM DARAJA C2B INTEGRATION
 // ==========================================
 
-// Safaricom Daraja C2B Confirmation Webhook (Handles both Meat & Snack Tills)
-app.post('/api/mpesa/c2b-confirmation', async (req, res) => {
+const DARAJA_BASE_URL = process.env.DARAJA_ENV === 'production'
+  ? 'https://api.safaricom.co.ke'
+  : 'https://sandbox.safaricom.co.ke';
+
+// Helper: Generate Daraja OAuth Access Token
+async function getDarajaToken() {
+  const auth = Buffer.from(
+    `${process.env.DARAJA_CONSUMER_KEY}:${process.env.DARAJA_CONSUMER_SECRET}`
+  ).toString('base64');
+
+  const response = await fetch(
+    `${DARAJA_BASE_URL}/oauth/v1/generate?grant_type=client_credentials`,
+    { headers: { Authorization: `Basic ${auth}` } }
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(`Daraja Auth Failed: ${JSON.stringify(data)}`);
+  return data.access_token;
+}
+
+// 6A. Register Confirmation & Validation URLs with Safaricom (Run once per Till)
+app.post('/api/payments/register-urls', async (req, res) => {
+  try {
+    const token = await getDarajaToken();
+    const shortcode = req.body.shortcode || process.env.MPESA_MEAT_TILL;
+
+    // NOTE: URL paths must NOT contain the word "mpesa" or Safaricom will reject them!
+    const payload = {
+      ShortCode: shortcode,
+      ResponseType: 'Completed',
+      ConfirmationURL: `${process.env.PUBLIC_BASE_URL}/api/payments/confirm`,
+      ValidationURL: `${process.env.PUBLIC_BASE_URL}/api/payments/validate`
+    };
+
+    const response = await fetch(`${DARAJA_BASE_URL}/mpesa/c2b/v1/registerurl`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+    res.json({ shortcode, daraja_response: data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 6B. Validation URL (Safaricom checks this before completing payment)
+app.post('/api/payments/validate', (req, res) => {
+  res.json({ ResultCode: 0, ResultDesc: 'Accepted' });
+});
+
+// 6C. Confirmation URL (Safaricom sends instant payment data here)
+app.post('/api/payments/confirm', async (req, res) => {
   try {
     const { TransID, TransAmount, BusinessShortCode, MSISDN, FirstName, MiddleName, LastName } = req.body;
     const customerName = [FirstName, MiddleName, LastName].filter(Boolean).join(' ');
-    
-    // Identify whether payment went to the Meat Till or Snack Till
-    const tillCategory = (String(BusinessShortCode) === String(process.env.MPESA_SNACK_TILL || '9387337')) ? 'SNACK' : 'MEAT';
+
+    const tillCategory = (String(BusinessShortCode) === String(process.env.MPESA_SNACK_TILL))
+      ? 'SNACK'
+      : 'MEAT';
 
     await pool.query(
       `INSERT INTO mpesa_c2b_transactions (mpesa_receipt, till_category, trans_time, amount, customer_phone, customer_name)
@@ -356,45 +411,38 @@ app.post('/api/mpesa/c2b-confirmation', async (req, res) => {
       [TransID, tillCategory, TransAmount, MSISDN, customerName]
     );
 
-    res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    console.log(`✅ Till Payment Recorded: ${TransID} - ${TransAmount} KES (${tillCategory})`);
+    res.json({ ResultCode: 0, ResultDesc: 'Accepted' });
   } catch (err) {
-    console.error("M-Pesa Webhook Error:", err);
-    res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    console.error('Webhook Error:', err);
+    res.json({ ResultCode: 0, ResultDesc: 'Accepted' });
   }
 });
 
-// Safaricom Daraja C2B Validation Webhook (Required by Safaricom when registering URLs)
-app.post('/api/mpesa/c2b-validation', (req, res) => {
-  res.json({ ResultCode: 0, ResultDesc: "Accepted" });
-});
-
-// Fetch Unmatched Meat Till Payments (For Cashier 1-Tap Matching Queue)
-app.get('/api/mpesa/unmatched-meat', async (req, res) => {
+// 6D. Simulate a C2B Till Payment via Daraja Sandbox API
+app.post('/api/payments/simulate-daraja', async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT * FROM mpesa_c2b_transactions 
-       WHERE till_category = 'MEAT' AND is_matched_to_pos = FALSE AND trans_date = CURRENT_DATE
-       ORDER BY trans_time DESC`
-    );
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    const token = await getDarajaToken();
+    const { shortcode, amount, phone } = req.body;
 
-// Daily Profit & Cash Flow Summary
-app.get('/api/dashboard/today', async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT * FROM daily_financial_summary WHERE report_date = CURRENT_DATE`
-    );
-    res.json(result.rows[0] || {
-      report_date: new Date().toISOString().split('T')[0],
-      total_daily_revenue: 0,
-      true_daily_net_profit: 0,
-      net_cash_flow_today: 0,
-      message: 'No sales recorded yet today.'
+    const payload = {
+      ShortCode: shortcode || process.env.MPESA_MEAT_TILL,
+      CommandID: 'CustomerBuyGoodsOnline', // Specific to Buy Goods Till Numbers
+      Amount: amount || 200,
+      Msisdn: phone || '254708374149'
+    };
+
+    const response = await fetch(`${DARAJA_BASE_URL}/mpesa/c2b/v1/simulate`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     });
+
+    const data = await response.json();
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
