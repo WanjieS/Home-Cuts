@@ -4,43 +4,346 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Home-Cuts Butchery & Snack Bar POS</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans for UI + JetBrains Mono for Tabular Numbers -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* High-Craft Design System Styles */
+    :root {
+      --bg-base: #060911;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(circle at 10% 0%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 90% 0%, rgba(16, 185, 129, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 50% 100%, rgba(14, 165, 233, 0.05) 0%, transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace !important;
+      font-feature-settings: 'tnum' 1, 'zero' 1;
+    }
+
+    /* Glassmorphic Surfaces */
+    .glass-card {
+      background: rgba(13, 19, 34, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(51, 65, 85, 0.4);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .glass-card-interactive {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(51, 65, 85, 0.45);
+      box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card-interactive:hover {
+      background: rgba(22, 32, 56, 0.85);
+      border-color: rgba(245, 158, 11, 0.5);
+      transform: translateY(-1.5px);
+      box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.6), 0 0 16px -2px rgba(245, 158, 11, 0.2);
+    }
+
+    .glass-card-interactive:active {
+      transform: scale(0.985);
+    }
+
+    /* High-Craft Form Inputs & Selects */
+    .craft-input {
+      background: rgba(7, 10, 18, 0.75);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      color: #f8fafc;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .craft-input:focus {
+      background: rgba(10, 15, 28, 0.95);
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+      outline: none;
+    }
+
+    /* Tab Button Styling Overrides for switchTab() compatibility */
+    button[id^="tab-"] {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.01em;
+      position: relative;
+    }
+
+    button[id^="tab-"].bg-amber-500 {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+      color: #060911 !important;
+      font-weight: 800 !important;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(251, 191, 36, 0.6);
+    }
+
+    button[id^="tab-"].bg-slate-800 {
+      background: rgba(15, 23, 42, 0.6) !important;
+      color: #94a3b8 !important;
+      border: 1px solid rgba(51, 65, 85, 0.45);
+      backdrop-filter: blur(8px);
+    }
+
+    button[id^="tab-"].bg-slate-800:hover {
+      background: rgba(30, 41, 59, 0.8) !important;
+      color: #f1f5f9 !important;
+      border-color: rgba(100, 116, 139, 0.6);
+    }
+
+    /* Stock Grid Dynamic Cards */
+    #stock-grid > div {
+      background: rgba(10, 15, 28, 0.7) !important;
+      border: 1px solid rgba(51, 65, 85, 0.5) !important;
+      backdrop-filter: blur(10px);
+      border-radius: 0.75rem;
+      padding: 0.75rem 0.85rem;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    #stock-grid > div:hover {
+      border-color: rgba(245, 158, 11, 0.4) !important;
+      background: rgba(15, 23, 42, 0.85) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    #stock-grid > div .text-sm.font-bold {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: 'tnum' 1;
+    }
+
+    /* Cart Items Dynamic List */
+    #cart-list > div {
+      background: rgba(10, 15, 28, 0.75) !important;
+      border: 1px solid rgba(51, 65, 85, 0.4) !important;
+      backdrop-filter: blur(8px);
+      border-radius: 0.625rem;
+      padding: 0.65rem 0.85rem;
+      transition: all 0.15s ease;
+    }
+
+    #cart-list > div:hover {
+      background: rgba(20, 29, 50, 0.85) !important;
+      border-color: rgba(245, 158, 11, 0.35) !important;
+    }
+
+    #cart-list span.font-bold {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: 'tnum' 1;
+    }
+
+    /* Incoming M-Pesa Till Queue Dynamic List */
+    #mpesa-queue > div {
+      background: linear-gradient(135deg, rgba(8, 47, 73, 0.3) 0%, rgba(10, 15, 28, 0.75) 100%) !important;
+      border: 1px solid rgba(14, 165, 233, 0.35) !important;
+      backdrop-filter: blur(10px);
+      border-radius: 0.75rem;
+      padding: 0.75rem 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    #mpesa-queue > div:hover {
+      border-color: rgba(56, 189, 248, 0.6) !important;
+      box-shadow: 0 4px 18px rgba(14, 165, 233, 0.2);
+    }
+
+    #mpesa-queue .font-bold.text-sky-300 {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: 'tnum' 1;
+    }
+
+    #mpesa-queue button {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+      border: 1px solid rgba(125, 211, 252, 0.3);
+      transition: all 0.2s;
+    }
+
+    #mpesa-queue button:hover {
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.6);
+      transform: translateY(-1px);
+    }
+
+    /* Snack Reconciliation Table Dynamic Rows */
+    #snack-recon-rows tr {
+      transition: background-color 0.15s ease;
+    }
+
+    #snack-recon-rows tr:hover {
+      background: rgba(30, 41, 59, 0.35);
+    }
+
+    #snack-recon-rows td {
+      padding-top: 0.85rem;
+      padding-bottom: 0.85rem;
+      vertical-align: middle;
+    }
+
+    #snack-recon-rows input {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: 'tnum' 1;
+      font-weight: 600;
+      background: rgba(7, 10, 18, 0.8) !important;
+      border: 1px solid rgba(51, 65, 85, 0.6) !important;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    #snack-recon-rows input:focus {
+      border-color: #f59e0b !important;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+      outline: none;
+    }
+
+    #snack-recon-rows button {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(110, 231, 183, 0.3);
+      transition: all 0.2s;
+    }
+
+    #snack-recon-rows button:hover {
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* P&L Statement */
+    #pnl-details span:last-child {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: 'tnum' 1;
+    }
+
+    /* Custom subtle scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(7, 10, 18, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.5);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(245, 158, 11, 0.5);
+    }
+  </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+<body class="text-slate-100 min-h-screen font-sans selection:bg-amber-500 selection:text-slate-950">
 
   <!-- TOP HEADER & LIVE FINANCIAL BANNER -->
-  <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-20 shadow-lg">
-    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-      <div>
-        <h1 class="text-xl font-bold text-amber-400 tracking-wide">🥩 HOME-CUTS POS & MANAGEMENT</h1>
-        <p class="text-xs text-slate-400" id="conn-status">Connecting to http://localhost:3001...</p>
+  <header class="bg-slate-950/85 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-30 shadow-2xl px-4 py-3.5">
+    <div class="max-w-7xl mx-auto flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
+      
+      <!-- Brand & Live System Radar -->
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500/20 via-amber-600/10 to-slate-900 border border-amber-500/40 flex items-center justify-center shadow-lg shadow-amber-500/10 flex-shrink-0">
+          <!-- Butcher Knife / Cleaver Icon -->
+          <svg class="w-6 h-6 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19.5 3.5 18 2l-6.5 6.5L10 7 4 13l3 3 1.5-1.5L15 21l6.5-6.5L20 13l1.5-1.5L19.5 3.5z"/>
+            <path d="m14 8 2 2"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent">
+              HOME-CUTS BUTCHERY
+            </h1>
+            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              POS & FINANCIALS
+            </span>
+          </div>
+          <div class="flex items-center gap-2 mt-0.5">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <p class="text-[11px] text-slate-400 font-mono tracking-tight" id="conn-status">Connecting to http://localhost:3001...</p>
+          </div>
+        </div>
       </div>
 
-      <!-- Dual Financial Scorecards -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto">
-        <div class="bg-slate-900/90 border border-slate-700 px-3 py-2 rounded-lg">
-          <div class="text-[11px] text-slate-400 uppercase">Today's Revenue</div>
-          <div class="text-lg font-bold text-white" id="stat-rev">0 KES</div>
+      <!-- Dual Financial Scorecards (Glassmorphic Tiles with Monospace KES Tabular Numerals) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 w-full xl:w-auto">
+        
+        <!-- Scorecard 1: Today's Revenue -->
+        <div class="glass-card px-3.5 py-2.5 rounded-xl border border-slate-700/60 relative overflow-hidden group">
+          <div class="flex items-center justify-between gap-1 mb-1">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Today's Revenue</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400/80"></span>
+          </div>
+          <div class="text-base sm:text-xl font-black font-mono text-white tracking-tight" id="stat-rev">0 KES</div>
         </div>
-        <div class="bg-emerald-950/60 border border-emerald-700/70 px-3 py-2 rounded-lg">
-          <div class="text-[11px] text-emerald-300 uppercase">True Net Profit (Accrued)</div>
-          <div class="text-lg font-bold text-emerald-400" id="stat-profit">0 KES</div>
+
+        <!-- Scorecard 2: True Net Profit (Accrued) -->
+        <div class="glass-card px-3.5 py-2.5 rounded-xl border border-emerald-600/50 bg-emerald-950/25 relative overflow-hidden group">
+          <div class="flex items-center justify-between gap-1 mb-1">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-300">True Net Profit</span>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-400/80 bg-emerald-500/15 px-1 rounded">Accrued</span>
+          </div>
+          <div class="text-base sm:text-xl font-black font-mono text-emerald-400 tracking-tight" id="stat-profit">0 KES</div>
         </div>
-        <div class="bg-sky-950/60 border border-sky-700/70 px-3 py-2 rounded-lg">
-          <div class="text-[11px] text-sky-300 uppercase">Net Cash Flow Today</div>
-          <div class="text-lg font-bold text-sky-400" id="stat-cashflow">0 KES</div>
+
+        <!-- Scorecard 3: Net Cash Flow Today -->
+        <div class="glass-card px-3.5 py-2.5 rounded-xl border border-sky-600/50 bg-sky-950/25 relative overflow-hidden group">
+          <div class="flex items-center justify-between gap-1 mb-1">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-sky-300">Net Cash Flow</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-400/80"></span>
+          </div>
+          <div class="text-base sm:text-xl font-black font-mono text-sky-400 tracking-tight" id="stat-cashflow">0 KES</div>
         </div>
-        <div class="bg-amber-950/60 border border-amber-700/70 px-3 py-2 rounded-lg">
-          <div class="text-[11px] text-amber-300 uppercase">Implied Snack Cash</div>
-          <div class="text-lg font-bold text-amber-400" id="stat-snack-cash">0 KES</div>
+
+        <!-- Scorecard 4: Implied Snack Cash -->
+        <div class="glass-card px-3.5 py-2.5 rounded-xl border border-amber-600/50 bg-amber-950/25 relative overflow-hidden group">
+          <div class="flex items-center justify-between gap-1 mb-1">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-amber-300">Snack Drawer Cash</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400/80"></span>
+          </div>
+          <div class="text-base sm:text-xl font-black font-mono text-amber-400 tracking-tight" id="stat-snack-cash">0 KES</div>
         </div>
+
       </div>
     </div>
   </header>
 
   <!-- NAVIGATION TABS -->
   <div class="max-w-7xl mx-auto px-4 pt-4">
-    <div class="flex flex-wrap gap-2 border-b border-slate-700 pb-3">
+    <div class="flex flex-wrap items-center gap-2 border-b border-slate-800/80 pb-3">
       <button onclick="switchTab('pos')" id="tab-pos" class="px-4 py-2 rounded-lg font-semibold text-sm bg-amber-500 text-slate-950">
         1. Meat POS & Till Queue
       </button>
@@ -53,138 +356,257 @@
       <button onclick="switchTab('pnl')" id="tab-pnl" class="px-4 py-2 rounded-lg font-semibold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700">
         4. Full P&L Breakdown
       </button>
-      <button onclick="refreshAll()" class="ml-auto px-3 py-2 rounded-lg text-xs bg-slate-700 hover:bg-slate-600 text-slate-200">
-        🔄 Refresh Data
+      <button onclick="refreshAll()" class="ml-auto px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/60 transition flex items-center gap-1.5 shadow-sm active:scale-[0.98]">
+        <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+          <path d="M21 3v5h-5"/>
+          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+          <path d="M8 16H3v5"/>
+        </svg>
+        Refresh Data
       </button>
     </div>
   </div>
 
   <!-- MAIN CONTENT AREA -->
-  <main class="max-w-7xl mx-auto p-4">
+  <main class="max-w-7xl mx-auto p-4 space-y-6">
 
     <!-- ALERT BANNER -->
-    <div id="toast" class="hidden mb-4 p-3 rounded-lg font-medium text-sm"></div>
+    <div id="toast" class="hidden mb-4 p-3.5 rounded-xl font-semibold text-sm backdrop-blur-md shadow-xl transition-all"></div>
 
     <!-- ==========================================
          TAB 1: MEAT POS & M-PESA QUEUE
     =========================================== -->
     <section id="view-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
-      <!-- Left 2 Cols: One-Tap Preset Buttons + Custom Cut Input -->
+      <!-- Left 2 Cols: One-Tap Preset Buttons + Custom Cut Input + Inventory Stock -->
       <div class="lg:col-span-2 space-y-6">
         
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
-          <h2 class="text-sm font-bold uppercase text-amber-400 mb-3">Quick One-Tap Meat & Service Presets</h2>
+        <!-- One-Tap Preset Cuts -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-800/80">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <h2 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-amber-400">
+                Quick One-Tap Meat & Service Presets
+              </h2>
+            </div>
+            <span class="text-[11px] text-slate-400 font-mono">Touch-ready Till Buttons</span>
+          </div>
+
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            
             <!-- Beef (Product ID 1) -->
-            <button onclick="addCartItem(1, 'Beef (200/- Cut)', 200, null)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
-              <div class="font-bold">Beef - 200 KES</div>
-              <div class="text-xs opacity-75">~0.235 kg @ 850/kg</div>
+            <button onclick="addCartItem(1, 'Beef (200/- Cut)', 200, null)" class="glass-card-interactive p-3.5 rounded-xl text-left transition group">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">Prime Beef</span>
+                <span class="text-[10px] font-mono text-slate-400">Fixed</span>
+              </div>
+              <div class="font-bold text-white group-hover:text-amber-300 transition text-base">Beef - 200 KES</div>
+              <div class="text-xs text-slate-400 font-mono mt-0.5">~0.235 kg @ 850/kg</div>
             </button>
-            <button onclick="addCartItem(1, 'Beef (1/2 Kg)', null, 0.5)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
-              <div class="font-bold">Beef - 1/2 Kg</div>
-              <div class="text-xs opacity-75">425 KES</div>
+
+            <button onclick="addCartItem(1, 'Beef (1/2 Kg)', null, 0.5)" class="glass-card-interactive p-3.5 rounded-xl text-left transition group">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">Prime Beef</span>
+                <span class="text-[10px] font-mono text-slate-400">0.50 kg</span>
+              </div>
+              <div class="font-bold text-white group-hover:text-amber-300 transition text-base">Beef - 1/2 Kg</div>
+              <div class="text-xs text-slate-400 font-mono mt-0.5">425 KES</div>
             </button>
-            <button onclick="addCartItem(1, 'Beef (1 Kg)', null, 1.0)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
-              <div class="font-bold">Beef - 1 Kg</div>
-              <div class="text-xs opacity-75">850 KES</div>
+
+            <button onclick="addCartItem(1, 'Beef (1 Kg)', null, 1.0)" class="glass-card-interactive p-3.5 rounded-xl text-left transition group">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">Prime Beef</span>
+                <span class="text-[10px] font-mono text-slate-400">1.00 kg</span>
+              </div>
+              <div class="font-bold text-white group-hover:text-amber-300 transition text-base">Beef - 1 Kg</div>
+              <div class="text-xs text-slate-400 font-mono mt-0.5">850 KES</div>
             </button>
 
             <!-- Mutton (Product ID 2) -->
-            <button onclick="addCartItem(2, 'Mutton (250/- Cut)', 250, null)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
-              <div class="font-bold">Mutton - 250 KES</div>
-              <div class="text-xs opacity-75">~0.263 kg @ 950/kg</div>
+            <button onclick="addCartItem(2, 'Mutton (250/- Cut)', 250, null)" class="glass-card-interactive p-3.5 rounded-xl text-left transition group">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/20">Goat/Mutton</span>
+                <span class="text-[10px] font-mono text-slate-400">Fixed</span>
+              </div>
+              <div class="font-bold text-white group-hover:text-rose-300 transition text-base">Mutton - 250 KES</div>
+              <div class="text-xs text-slate-400 font-mono mt-0.5">~0.263 kg @ 950/kg</div>
             </button>
-            <button onclick="addCartItem(2, 'Mutton (1/2 Kg)', null, 0.5)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
-              <div class="font-bold">Mutton - 1/2 Kg</div>
-              <div class="text-xs opacity-75">475 KES</div>
+
+            <button onclick="addCartItem(2, 'Mutton (1/2 Kg)', null, 0.5)" class="glass-card-interactive p-3.5 rounded-xl text-left transition group">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/20">Goat/Mutton</span>
+                <span class="text-[10px] font-mono text-slate-400">0.50 kg</span>
+              </div>
+              <div class="font-bold text-white group-hover:text-rose-300 transition text-base">Mutton - 1/2 Kg</div>
+              <div class="text-xs text-slate-400 font-mono mt-0.5">475 KES</div>
             </button>
-            <button onclick="addCartItem(2, 'Mutton (1 Kg)', null, 1.0)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
-              <div class="font-bold">Mutton - 1 Kg</div>
-              <div class="text-xs opacity-75">950 KES</div>
+
+            <button onclick="addCartItem(2, 'Mutton (1 Kg)', null, 1.0)" class="glass-card-interactive p-3.5 rounded-xl text-left transition group">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/20">Goat/Mutton</span>
+                <span class="text-[10px] font-mono text-slate-400">1.00 kg</span>
+              </div>
+              <div class="font-bold text-white group-hover:text-rose-300 transition text-base">Mutton - 1 Kg</div>
+              <div class="text-xs text-slate-400 font-mono mt-0.5">950 KES</div>
             </button>
 
             <!-- Liver (ID 3), Kidney (ID 4), Cooking Fee (ID 5) -->
-            <button onclick="addCartItem(3, 'Liver (200/- Cut)', 200, null)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
-              <div class="font-bold">Liver - 200 KES</div>
-              <div class="text-xs opacity-75">Offal Cut</div>
+            <button onclick="addCartItem(3, 'Liver (200/- Cut)', 200, null)" class="glass-card-interactive p-3.5 rounded-xl text-left transition group">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20">Fresh Offal</span>
+                <span class="text-[10px] font-mono text-slate-400">Fixed</span>
+              </div>
+              <div class="font-bold text-white group-hover:text-purple-300 transition text-base">Liver - 200 KES</div>
+              <div class="text-xs text-slate-400 font-mono mt-0.5">Offal Cut</div>
             </button>
-            <button onclick="addCartItem(4, 'Kidney (200/- Cut)', 200, null)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
-              <div class="font-bold">Kidney - 200 KES</div>
-              <div class="text-xs opacity-75">Offal Cut</div>
+
+            <button onclick="addCartItem(4, 'Kidney (200/- Cut)', 200, null)" class="glass-card-interactive p-3.5 rounded-xl text-left transition group">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20">Fresh Offal</span>
+                <span class="text-[10px] font-mono text-slate-400">Fixed</span>
+              </div>
+              <div class="font-bold text-white group-hover:text-purple-300 transition text-base">Kidney - 200 KES</div>
+              <div class="text-xs text-slate-400 font-mono mt-0.5">Offal Cut</div>
             </button>
-            <button onclick="addCartItem(5, 'Eat-In Cooking Fee', 200, null)" class="p-3 bg-emerald-800/70 hover:bg-emerald-500 hover:text-slate-950 border border-emerald-600 rounded-lg text-left transition">
-              <div class="font-bold">+ Cooking Fee</div>
-              <div class="text-xs opacity-90">200 KES (100% Margin)</div>
+
+            <button onclick="addCartItem(5, 'Eat-In Cooking Fee', 200, null)" class="glass-card-interactive p-3.5 rounded-xl text-left transition group bg-emerald-950/40 border-emerald-600/40 hover:border-emerald-500/70">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Service Fee</span>
+                <span class="text-[10px] font-mono font-bold text-emerald-400">100% MARGIN</span>
+              </div>
+              <div class="font-bold text-emerald-300 group-hover:text-emerald-200 transition text-base">+ Cooking Fee</div>
+              <div class="text-xs text-emerald-400/80 font-mono mt-0.5">200 KES (Eat-In Fry/Boil)</div>
             </button>
+
           </div>
         </div>
 
         <!-- Custom Scale / Arbitrary Price Builder -->
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
-          <h2 class="text-sm font-bold uppercase text-slate-300 mb-3">Custom Cut (Enter either Weight OR Price)</h2>
+        <div class="glass-card rounded-2xl p-5 border border-slate-800/80">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+              <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                <path d="M7 21h10"/>
+                <path d="M12 3v18"/>
+                <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+              </svg>
+              Custom Cut Builder (Enter Price OR Weight)
+            </h2>
+            <span class="text-[11px] text-slate-400">Auto Scale Computation</span>
+          </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
             <div>
-              <label class="text-xs text-slate-400">Select Meat</label>
-              <select id="custom-prod" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm"></select>
+              <label class="text-xs text-slate-400 font-medium">Select Meat Cut</label>
+              <select id="custom-prod" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm"></select>
             </div>
             <div>
-              <label class="text-xs text-slate-400">By Price (KES)</label>
-              <input type="number" id="custom-price" placeholder="e.g. 350" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+              <label class="text-xs text-slate-400 font-medium">By Price (KES)</label>
+              <input type="number" id="custom-price" placeholder="e.g. 350" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm font-mono" />
             </div>
             <div>
-              <label class="text-xs text-slate-400">OR By Weight (Kg)</label>
-              <input type="number" step="0.05" id="custom-weight" placeholder="e.g. 0.75" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+              <label class="text-xs text-slate-400 font-medium">OR By Weight (Kg)</label>
+              <input type="number" step="0.05" id="custom-weight" placeholder="e.g. 0.75" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm font-mono" />
             </div>
-            <button onclick="addCustomCut()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 px-4 rounded-lg text-sm">
-              + Add to Cart
+            <button onclick="addCustomCut()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold py-2.5 px-4 rounded-lg text-sm shadow-lg shadow-amber-500/20 transition active:scale-[0.98] flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/>
+                <path d="M12 5v14"/>
+              </svg>
+              Add to Cart
             </button>
           </div>
         </div>
 
         <!-- Live Stock Levels -->
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
-          <h2 class="text-sm font-bold uppercase text-slate-300 mb-3">Available Batch Inventory</h2>
+        <div class="glass-card rounded-2xl p-5 border border-slate-800/80">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                <path d="m3.3 7 8.7 5 8.7-5"/>
+                <path d="M12 22V12"/>
+              </svg>
+              Available Batch Inventory
+            </h2>
+            <span class="text-[11px] text-slate-400 font-mono">Live Depletion</span>
+          </div>
           <div id="stock-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm"></div>
         </div>
+
       </div>
 
       <!-- Right 1 Col: Active Cart & M-Pesa Till Matching -->
       <div class="space-y-6">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        
+        <!-- Active POS Cart Panel -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-800/80 sticky top-24">
           <div class="flex justify-between items-center mb-3">
-            <h2 class="text-sm font-bold uppercase text-amber-400">Active POS Cart</h2>
-            <button onclick="clearCart()" class="text-xs text-rose-400 hover:underline">Clear</button>
-          </div>
-          <div id="cart-list" class="space-y-2 text-sm min-h-[100px] border-b border-slate-700 pb-3">
-            <p class="text-slate-500 text-xs italic">Tap items on the left to add...</p>
-          </div>
-          <div class="flex justify-between items-center py-3 text-lg font-bold">
-            <span>Total Due:</span>
-            <span id="cart-total" class="text-amber-400">0 KES</span>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="21" r="1"/>
+                <circle cx="19" cy="21" r="1"/>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+              </svg>
+              <h2 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-amber-400">Active POS Cart</h2>
+            </div>
+            <button onclick="clearCart()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold tracking-wide transition flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+              </svg>
+              Clear
+            </button>
           </div>
 
-          <div class="space-y-2">
-            <button onclick="checkoutCart('CASH')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-lg text-sm">
-              💵 Complete Sale (CASH)
+          <!-- Items list container -->
+          <div id="cart-list" class="space-y-2 text-sm min-h-[120px] max-h-[280px] overflow-y-auto pr-1 border-b border-slate-800/80 pb-3">
+            <p class="text-slate-500 text-xs italic py-4 text-center">Tap items on the left to add...</p>
+          </div>
+
+          <!-- Total Due Row -->
+          <div class="flex justify-between items-center py-4 text-base font-bold">
+            <span class="text-xs uppercase font-extrabold tracking-wider text-slate-400">Total Due:</span>
+            <span id="cart-total" class="text-2xl font-black font-mono text-amber-400 tracking-tight">0 KES</span>
+          </div>
+
+          <!-- Checkout Actions -->
+          <div class="space-y-2.5">
+            <button onclick="checkoutCart('CASH')" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black py-3.5 rounded-xl text-sm shadow-lg shadow-emerald-500/25 transition-all duration-150 active:scale-[0.98] flex items-center justify-center gap-2">
+              <span>💵</span>
+              <span>Complete Sale (CASH)</span>
             </button>
-            <button onclick="checkoutCart('MPESA_MEAT_TILL')" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm">
-              📱 Complete Sale (Direct Meat M-Pesa)
+            <button onclick="checkoutCart('MPESA_MEAT_TILL')" class="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 text-slate-950 font-black py-3 rounded-xl text-sm shadow-lg shadow-sky-500/25 transition-all duration-150 active:scale-[0.98] flex items-center justify-center gap-2">
+              <span>📱</span>
+              <span>Complete Sale (Direct Meat M-Pesa)</span>
             </button>
           </div>
+
+          <!-- Unmatched M-Pesa Meat Till Webhook Queue Inside Cart Column -->
+          <div class="mt-6 pt-5 border-t border-slate-800/80">
+            <div class="flex justify-between items-center mb-2">
+              <h2 class="text-xs font-extrabold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                </span>
+                Meat Till M-Pesa Queue
+              </h2>
+              <button onclick="simulateMpesa('MEAT')" class="text-[11px] bg-sky-950/80 hover:bg-sky-900 text-sky-300 border border-sky-800/60 px-2 py-1 rounded-md font-medium transition active:scale-[0.98]">
+                + Simulate Till Webhook
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-3">Tap a received payment below to link & close the active cart:</p>
+            <div id="mpesa-queue" class="space-y-2 text-xs"></div>
+          </div>
+
         </div>
 
-        <!-- Unmatched M-Pesa Meat Till Webhook Queue -->
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="text-xs font-bold uppercase text-sky-400">Incoming Meat Till M-Pesa Queue</h2>
-            <button onclick="simulateMpesa('MEAT')" class="text-[11px] bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded">
-              + Simulate Customer Till Payment
-            </button>
-          </div>
-          <p class="text-[11px] text-slate-400 mb-3">Tap a received payment below to link & close the active cart:</p>
-          <div id="mpesa-queue" class="space-y-2 text-xs"></div>
-        </div>
       </div>
     </section>
 
@@ -192,31 +614,37 @@
          TAB 2: END-OF-DAY SNACK RECONCILIATION
     =========================================== -->
     <section id="view-snacks" class="hidden space-y-6">
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+      <div class="glass-card rounded-2xl p-6 border border-slate-800/80">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
-            <h2 class="text-base font-bold text-amber-400">End-of-Day Snack Count (Zero-Logging Bypass)</h2>
-            <p class="text-xs text-slate-400">Enter morning opening count and evening remaining count. System calculates total sold, subtracts Snack Till M-Pesa, and shows required Cash.</p>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <h2 class="text-base sm:text-lg font-extrabold text-amber-400 tracking-tight">End-of-Day Snack Count (Zero-Logging Bypass)</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1 max-w-3xl">
+              Enter morning opening count and evening remaining count. System calculates total sold, subtracts Snack Till M-Pesa, and shows required Cash.
+            </p>
           </div>
-          <button onclick="simulateMpesa('SNACK')" class="text-xs bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-2 rounded-lg">
-            📱 Simulate Snack Till M-Pesa (+150 KES)
+          <button onclick="simulateMpesa('SNACK')" class="text-xs bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white font-bold px-3.5 py-2.5 rounded-xl shadow-lg shadow-sky-600/20 transition active:scale-[0.98] flex items-center gap-2">
+            <span>📱</span>
+            <span>Simulate Snack Till M-Pesa (+150 KES)</span>
           </button>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto rounded-xl border border-slate-800/60">
           <table class="w-full text-left text-sm border-collapse">
             <thead>
-              <tr class="border-b border-slate-700 text-slate-400 text-xs uppercase">
-                <th class="py-2">Snack Item</th>
-                <th class="py-2">Selling Price</th>
-                <th class="py-2">Opening Stock</th>
-                <th class="py-2">Added Today</th>
-                <th class="py-2">Closing Left</th>
-                <th class="py-2">Spoiled / Wastage</th>
-                <th class="py-2">Action</th>
+              <tr class="bg-slate-900/80 border-b border-slate-800 text-slate-400 text-[11px] uppercase tracking-wider">
+                <th class="py-3 px-3">Snack Item</th>
+                <th class="py-3 px-3">Selling Price</th>
+                <th class="py-3 px-3 text-center">Opening Stock</th>
+                <th class="py-3 px-3 text-center">Added Today</th>
+                <th class="py-3 px-3 text-center">Closing Left</th>
+                <th class="py-3 px-3 text-center">Spoiled / Wastage</th>
+                <th class="py-3 px-3 text-right">Action</th>
               </tr>
             </thead>
-            <tbody id="snack-recon-rows" class="divide-y divide-slate-700/60"></tbody>
+            <tbody id="snack-recon-rows" class="divide-y divide-slate-800/60 bg-slate-950/40"></tbody>
           </table>
         </div>
       </div>
@@ -228,118 +656,139 @@
     <section id="view-stock" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
 
       <!-- 1. Meat Carcass / Smokies / Sausages Batch Purchase -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
-        <h3 class="font-bold text-amber-400 text-sm uppercase">1. Buy Meat Carcass or Snack Packets (Adds to Stock)</h3>
+      <div class="glass-card rounded-2xl p-5 border border-slate-800/80 space-y-3.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <h3 class="font-bold text-amber-400 text-sm uppercase tracking-wider">1. Buy Meat Carcass or Snack Packets</h3>
+        </div>
         <div>
-          <label class="text-xs text-slate-400">Product</label>
-          <select id="batch-prod" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm"></select>
+          <label class="text-xs text-slate-400 font-medium">Product</label>
+          <select id="batch-prod" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm"></select>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-xs text-slate-400">Raw Qty (Kg or Pieces)</label>
-            <input type="number" id="batch-qty" placeholder="e.g. 50" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            <label class="text-xs text-slate-400 font-medium">Raw Qty (Kg or Pieces)</label>
+            <input type="number" id="batch-qty" placeholder="e.g. 50" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm font-mono" />
           </div>
           <div>
-            <label class="text-xs text-slate-400">Bone/Shrinkage % (Meat=5, Snacks=0)</label>
-            <input type="number" id="batch-shrink" value="5" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            <label class="text-xs text-slate-400 font-medium">Bone/Shrinkage % (Meat=5, Snacks=0)</label>
+            <input type="number" id="batch-shrink" value="5" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm font-mono" />
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-xs text-slate-400">Total Cost Paid (KES)</label>
-            <input type="number" id="batch-cost" placeholder="e.g. 30000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            <label class="text-xs text-slate-400 font-medium">Total Cost Paid (KES)</label>
+            <input type="number" id="batch-cost" placeholder="e.g. 30000" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm font-mono" />
           </div>
           <div>
-            <label class="text-xs text-slate-400">Paid Via</label>
-            <select id="batch-via" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
+            <label class="text-xs text-slate-400 font-medium">Paid Via</label>
+            <select id="batch-via" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm">
               <option value="CASH">Cash</option>
               <option value="MPESA_MEAT_TILL">Meat M-Pesa Till</option>
             </select>
           </div>
         </div>
-        <button onclick="submitStockBatch()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm">
+        <button onclick="submitStockBatch()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-3 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition active:scale-[0.98]">
           Save Inventory Batch
         </button>
       </div>
 
       <!-- 2. In-House Samosa Folding Run -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
-        <h3 class="font-bold text-emerald-400 text-sm uppercase">2. In-House Samosa Production Batch</h3>
+      <div class="glass-card rounded-2xl p-5 border border-slate-800/80 space-y-3.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <h3 class="font-bold text-emerald-400 text-sm uppercase tracking-wider">2. In-House Samosa Production Batch</h3>
+        </div>
         <div class="grid grid-cols-3 gap-2">
           <div>
-            <label class="text-xs text-slate-400">Minced Meat (KES)</label>
-            <input type="number" id="sam-meat" placeholder="1000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            <label class="text-xs text-slate-400 font-medium">Minced Meat (KES)</label>
+            <input type="number" id="sam-meat" placeholder="1000" class="craft-input w-full mt-1.5 rounded-lg p-2 text-sm font-mono" />
           </div>
           <div>
-            <label class="text-xs text-slate-400">Flour (KES)</label>
-            <input type="number" id="sam-flour" placeholder="300" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            <label class="text-xs text-slate-400 font-medium">Flour (KES)</label>
+            <input type="number" id="sam-flour" placeholder="300" class="craft-input w-full mt-1.5 rounded-lg p-2 text-sm font-mono" />
           </div>
           <div>
-            <label class="text-xs text-slate-400">Onions/Spices (KES)</label>
-            <input type="number" id="sam-onion" placeholder="200" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            <label class="text-xs text-slate-400 font-medium">Onions/Spices (KES)</label>
+            <input type="number" id="sam-onion" placeholder="200" class="craft-input w-full mt-1.5 rounded-lg p-2 text-sm font-mono" />
           </div>
         </div>
         <div>
-          <label class="text-xs text-slate-400">Total Samosa Pieces Folded from Batch</label>
-          <input type="number" id="sam-pcs" placeholder="e.g. 100" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          <label class="text-xs text-slate-400 font-medium">Total Samosa Pieces Folded from Batch</label>
+          <input type="number" id="sam-pcs" placeholder="e.g. 100" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm font-mono" />
         </div>
-        <button onclick="submitSamosaRun()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm">
+        <button onclick="submitSamosaRun()" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black py-3 rounded-xl text-sm shadow-lg shadow-emerald-500/20 transition active:scale-[0.98]">
           Log Samosa Batch & Add to Stock
         </button>
       </div>
 
       <!-- 3. Amortized Consumables (Oil, Gas, Potatoes) -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
-        <h3 class="font-bold text-sky-400 text-sm uppercase">3. Log Oil, Gas, or Potatoes (Spread Over Days)</h3>
+      <div class="glass-card rounded-2xl p-5 border border-slate-800/80 space-y-3.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+          <h3 class="font-bold text-sky-400 text-sm uppercase tracking-wider">3. Log Oil, Gas, or Potatoes (Spread Over Days)</h3>
+        </div>
         <div class="grid grid-cols-3 gap-2">
           <div>
-            <label class="text-xs text-slate-400">Item</label>
-            <select id="con-name" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
+            <label class="text-xs text-slate-400 font-medium">Item</label>
+            <select id="con-name" class="craft-input w-full mt-1.5 rounded-lg p-2 text-sm">
               <option value="Cooking Oil">Cooking Oil</option>
               <option value="LPG Gas">LPG Gas</option>
               <option value="Potatoes">Potatoes</option>
             </select>
           </div>
           <div>
-            <label class="text-xs text-slate-400">Total Cost (KES)</label>
-            <input type="number" id="con-cost" placeholder="4200" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            <label class="text-xs text-slate-400 font-medium">Total Cost (KES)</label>
+            <input type="number" id="con-cost" placeholder="4200" class="craft-input w-full mt-1.5 rounded-lg p-2 text-sm font-mono" />
           </div>
           <div>
-            <label class="text-xs text-slate-400">Est. Days Lasting</label>
-            <input type="number" id="con-days" value="7" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            <label class="text-xs text-slate-400 font-medium">Est. Days Lasting</label>
+            <input type="number" id="con-days" value="7" class="craft-input w-full mt-1.5 rounded-lg p-2 text-sm font-mono" />
           </div>
         </div>
-        <button onclick="submitConsumable()" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm">
+        <button onclick="submitConsumable()" class="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 text-slate-950 font-black py-3 rounded-xl text-sm shadow-lg shadow-sky-500/20 transition active:scale-[0.98]">
           Start Daily Amortization Cycle
         </button>
       </div>
 
       <!-- 4. Monthly Rent & Electricity Overhead Config -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
-        <h3 class="font-bold text-purple-400 text-sm uppercase">4. Monthly Rent & Electricity Budget</h3>
+      <div class="glass-card rounded-2xl p-5 border border-slate-800/80 space-y-3.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+          <h3 class="font-bold text-purple-400 text-sm uppercase tracking-wider">4. Monthly Rent & Electricity Budget</h3>
+        </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-xs text-slate-400">Monthly Rent (KES)</label>
-            <input type="number" id="ov-rent" value="25000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            <label class="text-xs text-slate-400 font-medium">Monthly Rent (KES)</label>
+            <input type="number" id="ov-rent" value="25000" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm font-mono" />
           </div>
           <div>
-            <label class="text-xs text-slate-400">Monthly Electricity (KES)</label>
-            <input type="number" id="ov-elec" value="5000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            <label class="text-xs text-slate-400 font-medium">Monthly Electricity (KES)</label>
+            <input type="number" id="ov-elec" value="5000" class="craft-input w-full mt-1.5 rounded-lg p-2.5 text-sm font-mono" />
           </div>
         </div>
-        <button onclick="submitOverheads()" class="w-full bg-purple-500 hover:bg-purple-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm">
+        <button onclick="submitOverheads()" class="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-slate-950 font-black py-3 rounded-xl text-sm shadow-lg shadow-purple-500/20 transition active:scale-[0.98]">
           Set Daily Overhead Share
         </button>
       </div>
+
     </section>
 
     <!-- ==========================================
          TAB 4: FULL DAILY P&L & CASH FLOW REPORT
     =========================================== -->
     <section id="view-pnl" class="hidden">
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-3xl mx-auto space-y-4">
-        <h2 class="text-lg font-bold text-amber-400 border-b border-slate-700 pb-2">Today's Complete Accounting Statement</h2>
-        <div id="pnl-details" class="space-y-3 text-sm"></div>
+      <div class="glass-card rounded-2xl p-6 sm:p-8 max-w-3xl mx-auto space-y-5 border border-slate-800/80 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+            <h2 class="text-base sm:text-lg font-black text-amber-400 tracking-tight">Today's Complete Accounting Statement</h2>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
+            Real-time Audit Ledger
+          </span>
+        </div>
+        <div id="pnl-details" class="space-y-3.5 text-sm"></div>
       </div>
     </section>
 
