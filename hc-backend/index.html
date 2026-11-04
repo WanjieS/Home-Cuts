@@ -591,9 +591,15 @@
               GOOD FOOD
             </span>
           </div>
-          <div class="flex items-center gap-2 mt-0.5">
+          <div class="flex flex-wrap items-center gap-2 mt-1">
             <span class="live-dot live-dot-emerald"></span>
-            <p class="text-[11px] text-slate-400 tnum tracking-tight" id="conn-status">Connecting to server...</p>
+            <p class="text-[11px] text-slate-400 tnum tracking-tight mr-1" id="conn-status">Connecting to server...</p>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20">
+              🥩 Meat Till: <strong class="text-white">201039</strong>
+            </span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-300 border border-sky-500/20">
+              🍟 Chips Till: <strong class="text-white">9387337</strong>
+            </span>
           </div>
         </div>
       </div>
@@ -643,10 +649,10 @@
   <div class="max-w-[1400px] mx-auto px-5 pt-5 relative z-10">
     <div class="flex flex-wrap items-center gap-2 pb-4" style="border-bottom: 1px solid var(--border);">
       <button onclick="switchTab('pos')" id="tab-pos" class="px-4 py-2 rounded-lg font-semibold text-sm bg-amber-500 text-slate-950">
-        1. Sell Meat &amp; M-Pesa Till
+        1. Sell Meat &amp; Till 201039
       </button>
       <button onclick="switchTab('snacks')" id="tab-snacks" class="px-4 py-2 rounded-lg font-semibold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700">
-        2. Daily Snack Stock Count
+        2. Chips &amp; Snack Count (Till 9387337)
       </button>
       <button onclick="switchTab('stock')" id="tab-stock" class="px-4 py-2 rounded-lg font-semibold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700">
         3. Add Stock, Samosas &amp; Expenses
@@ -887,7 +893,7 @@
             </button>
             <button onclick="checkoutCart('MPESA_MEAT_TILL')" class="cta cta-mpesa">
               <span class="text-lg leading-none">📱</span>
-              <span>Paid via Meat Till M-Pesa</span>
+              <span>Paid via Meat Till (201039)</span>
             </button>
           </div>
 
@@ -896,13 +902,13 @@
             <div class="flex justify-between items-center mb-3">
               <h2 class="text-[11px] font-extrabold uppercase tracking-[0.08em] text-sky-400 flex items-center gap-2">
                 <span class="live-dot live-dot-sky"></span>
-                Incoming Meat Till Payments
+                Incoming Meat Till (201039) Payments
               </h2>
               <button onclick="simulateMpesa('MEAT')" class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition active:scale-95" style="background: rgba(14, 165, 233, 0.12); color: #7DD3FC; border: 1px solid rgba(14, 165, 233, 0.25);">
-                + Test M-Pesa Payment
+                + Test Till 201039 Payment
               </button>
             </div>
-            <p class="text-[10px] text-slate-500 mb-3">When a customer pays via Till, tap their payment below to finish the sale:</p>
+            <p class="text-[10px] text-slate-500 mb-3">When a customer pays to Meat Till 201039, tap their payment below to finish the sale:</p>
             <div id="mpesa-queue" class="space-y-2 text-xs"></div>
           </div>
         </div>
@@ -919,16 +925,16 @@
           <div>
             <div class="flex items-center gap-2.5">
               <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
-              <h2 class="text-base font-extrabold text-white tracking-tight">Daily Snack Stock Count</h2>
-              <span class="text-[8px] uppercase font-bold tracking-[0.1em] px-2 py-0.5 rounded-full text-amber-400" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.25);">Evening Stock Check</span>
+              <h2 class="text-base font-extrabold text-white tracking-tight">Daily Snack &amp; Chips Count</h2>
+              <span class="text-[9px] uppercase font-bold tracking-[0.08em] px-2 py-0.5 rounded-full text-sky-300" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.25);">Chips Till: 9387337</span>
             </div>
             <p class="text-xs text-slate-400 mt-1.5 max-w-2xl leading-relaxed">
-              Count what you had in the morning and what is left this evening. The system calculates how many were sold, deducts what came through the Snack M-Pesa Till, and shows the exact cash that should be in the drawer.
+              Count what you had in the morning and what is left this evening. The system calculates how many were sold, deducts what came through the Chips M-Pesa Till (9387337), and shows the exact cash that should be in the drawer.
             </p>
           </div>
           <button onclick="simulateMpesa('SNACK')" class="cta cta-mpesa !w-auto !px-5 text-xs">
             <span>📱</span>
-            <span>Test Snack Till M-Pesa (+150 KES)</span>
+            <span>Test Chips Till 9387337 (+150 KES)</span>
           </button>
         </div>
 
@@ -985,7 +991,7 @@
             <label class="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">Paid Via</label>
             <select id="batch-via" class="field mt-1.5">
               <option value="CASH">Cash from Shop</option>
-              <option value="MPESA_MEAT_TILL">From Meat M-Pesa Till</option>
+              <option value="MPESA_MEAT_TILL">From Meat M-Pesa Till (201039)</option>
             </select>
           </div>
         </div>
@@ -1169,8 +1175,8 @@
       document.getElementById('pnl-details').innerHTML = `
         <div class="flex justify-between py-1.5"><span>Meat & Cooking Sales:</span><span class="font-bold">${Number(d.meat_and_cooking_rev || 0).toLocaleString()} KES</span></div>
         <div class="flex justify-between py-1.5"><span>Total Snack Sales (Smokies, Samosas, etc.):</span><span class="font-bold">${Number(d.snack_rev || 0).toLocaleString()} KES</span></div>
-        <div class="flex justify-between py-1 text-xs text-slate-400 pl-4"><span>↳ Paid via Snack M-Pesa Till:</span><span>${Number(d.snack_mpesa_rev || 0).toLocaleString()} KES</span></div>
-        <div class="flex justify-between py-1 text-xs text-amber-300 pl-4"><span>↳ Cash you should collect from snacks:</span><span>${Number(d.implied_snack_cash_rev || 0).toLocaleString()} KES</span></div>
+        <div class="flex justify-between py-1 text-xs text-slate-400 pl-4"><span>↳ Paid via Chips / Snack M-Pesa Till (9387337):</span><span>${Number(d.snack_mpesa_rev || 0).toLocaleString()} KES</span></div>
+        <div class="flex justify-between py-1 text-xs text-amber-300 pl-4"><span>↳ Cash you should collect from snacks &amp; chips:</span><span>${Number(d.implied_snack_cash_rev || 0).toLocaleString()} KES</span></div>
         <hr class="border-slate-800 my-2"/>
         <div class="flex justify-between py-1.5 text-rose-300"><span>(-) Cost of Goods Sold (Meat Sold Today):</span><span>-${Number(d.meat_cogs || 0).toLocaleString()} KES</span></div>
         <div class="flex justify-between py-1.5 text-rose-300"><span>(-) Cost of Goods Sold (Snacks Sold & Damaged Today):</span><span>-${Number(d.snack_cogs || 0).toLocaleString()} KES</span></div>
@@ -1188,14 +1194,14 @@
       const list = await res.json();
       const container = document.getElementById('mpesa-queue');
       if (!list.length) {
-        container.innerHTML = `<p class="text-slate-500 italic">No pending M-Pesa payments right now.</p>`;
+        container.innerHTML = `<p class="text-slate-500 italic">No pending payments on Meat Till 201039 right now.</p>`;
         return;
       }
       container.innerHTML = list.map(tx => `
         <div class="flex justify-between items-center bg-slate-900 border border-sky-800 p-2 rounded-lg">
           <div>
             <div class="font-bold text-sky-300">${Number(tx.amount)} KES — ${tx.customer_name || 'Customer'}</div>
-            <div class="text-[10px] text-slate-400">M-Pesa Code: ${tx.mpesa_receipt}</div>
+            <div class="text-[10px] text-slate-400">Meat Till 201039 • Code: ${tx.mpesa_receipt}</div>
           </div>
           <button onclick="checkoutCart('MPESA_MEAT_TILL', '${tx.mpesa_receipt}', ${Number(tx.amount)})" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-2.5 py-1 rounded text-xs">
             Match to This Order
@@ -1266,7 +1272,7 @@
       const data = await res.json();
       if (!res.ok) return showToast(data.error || 'Could not complete the sale. Please check your connection and try again.', true);
 
-      showToast(`✅ Sale of ${total} KES recorded via ${payment_type === 'CASH' ? 'Cash' : 'M-Pesa Till'}!`);
+      showToast(`✅ Sale of ${total} KES recorded via ${payment_type === 'CASH' ? 'Cash' : 'Meat Till (201039)'}!`);
       clearCart();
       refreshAll();
     }
@@ -1363,23 +1369,24 @@
       refreshAll();
     }
 
-    // SIMULATE DARAJA C2B WEBHOOK
+    // SIMULATE DARAJA C2B WEBHOOK (Meat Till: 201039, Chips Till: 9387337)
     async function simulateMpesa(type) {
       const receipt = 'SJK' + Math.floor(100000 + Math.random() * 900000);
       const amount = type === 'SNACK' ? 150 : (cart.reduce((s, i) => s + i.revenue_amount, 0) || 400);
+      const tillNumber = type === 'SNACK' ? '9387337' : '201039';
       await fetch(`${API_BASE}/mpesa/c2b-confirmation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           TransID: receipt,
           TransAmount: amount,
-          BusinessShortCode: type === 'SNACK' ? (window.SNACK_TILL || '999999') : '111111',
+          BusinessShortCode: tillNumber,
           MSISDN: '254712345678',
           FirstName: 'JOHN',
           LastName: 'KAMAU'
         })
       });
-      showToast(`📲 Received ${type === 'SNACK' ? 'Snack' : 'Meat'} Till payment: ${amount} KES (Code: ${receipt})`);
+      showToast(`📲 Received ${type === 'SNACK' ? 'Chips / Snack Till (9387337)' : 'Meat Till (201039)'} payment: ${amount} KES (Code: ${receipt})`);
       refreshAll();
     }
 

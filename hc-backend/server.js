@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
@@ -348,7 +348,7 @@ app.post('/api/mpesa/c2b-confirmation', async (req, res) => {
     const customerName = [FirstName, MiddleName, LastName].filter(Boolean).join(' ');
     
     // Identify whether payment went to the Meat Till or Snack Till
-    const tillCategory = (BusinessShortCode === (process.env.MPESA_SNACK_TILL || '999999')) ? 'SNACK' : 'MEAT';
+    const tillCategory = (String(BusinessShortCode) === String(process.env.MPESA_SNACK_TILL || '9387337')) ? 'SNACK' : 'MEAT';
 
     await pool.query(
       `INSERT INTO mpesa_c2b_transactions (mpesa_receipt, till_category, trans_time, amount, customer_phone, customer_name)
@@ -393,6 +393,10 @@ app.get('/api/dashboard/today', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'active', timestamp: new Date() });
 });
 
 const PORT = process.env.PORT || 3001;
