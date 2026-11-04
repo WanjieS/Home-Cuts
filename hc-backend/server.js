@@ -363,6 +363,11 @@ app.post('/api/mpesa/c2b-confirmation', async (req, res) => {
   }
 });
 
+// Safaricom Daraja C2B Validation Webhook (Required by Safaricom when registering URLs)
+app.post('/api/mpesa/c2b-validation', (req, res) => {
+  res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+});
+
 // Fetch Unmatched Meat Till Payments (For Cashier 1-Tap Matching Queue)
 app.get('/api/mpesa/unmatched-meat', async (req, res) => {
   try {

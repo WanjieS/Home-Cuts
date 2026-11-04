@@ -1097,7 +1097,8 @@
        JAVASCRIPT LOGIC (API & ID PRESERVED 100%)
   ═══════════════════════════════════════════ -->
   <script>
-    const API_BASE = 'http://localhost:3001/api';
+    // Dynamic API Base: automatically uses Render domain in production or localhost if testing local file
+    const API_BASE = (window.location.protocol === 'file:') ? 'http://localhost:3001/api' : '/api';
     let products = [];
     let cart = [];
 
