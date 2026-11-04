@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home-Cuts Butchery & Snack Bar POS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+  <!-- TOP HEADER & LIVE FINANCIAL BANNER -->
+  <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-20 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+      <div>
+        <h1 class="text-xl font-bold text-amber-400 tracking-wide">🥩 HOME-CUTS POS & MANAGEMENT</h1>
+        <p class="text-xs text-slate-400" id="conn-status">Connecting to http://localhost:3001...</p>
+      </div>
+
+      <!-- Dual Financial Scorecards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto">
+        <div class="bg-slate-900/90 border border-slate-700 px-3 py-2 rounded-lg">
+          <div class="text-[11px] text-slate-400 uppercase">Today's Revenue</div>
+          <div class="text-lg font-bold text-white" id="stat-rev">0 KES</div>
+        </div>
+        <div class="bg-emerald-950/60 border border-emerald-700/70 px-3 py-2 rounded-lg">
+          <div class="text-[11px] text-emerald-300 uppercase">True Net Profit (Accrued)</div>
+          <div class="text-lg font-bold text-emerald-400" id="stat-profit">0 KES</div>
+        </div>
+        <div class="bg-sky-950/60 border border-sky-700/70 px-3 py-2 rounded-lg">
+          <div class="text-[11px] text-sky-300 uppercase">Net Cash Flow Today</div>
+          <div class="text-lg font-bold text-sky-400" id="stat-cashflow">0 KES</div>
+        </div>
+        <div class="bg-amber-950/60 border border-amber-700/70 px-3 py-2 rounded-lg">
+          <div class="text-[11px] text-amber-300 uppercase">Implied Snack Cash</div>
+          <div class="text-lg font-bold text-amber-400" id="stat-snack-cash">0 KES</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <div class="max-w-7xl mx-auto px-4 pt-4">
+    <div class="flex flex-wrap gap-2 border-b border-slate-700 pb-3">
+      <button onclick="switchTab('pos')" id="tab-pos" class="px-4 py-2 rounded-lg font-semibold text-sm bg-amber-500 text-slate-950">
+        1. Meat POS & Till Queue
+      </button>
+      <button onclick="switchTab('snacks')" id="tab-snacks" class="px-4 py-2 rounded-lg font-semibold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700">
+        2. EOD Snack Reconciliation
+      </button>
+      <button onclick="switchTab('stock')" id="tab-stock" class="px-4 py-2 rounded-lg font-semibold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700">
+        3. Log Stock, Samosas & Bills
+      </button>
+      <button onclick="switchTab('pnl')" id="tab-pnl" class="px-4 py-2 rounded-lg font-semibold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700">
+        4. Full P&L Breakdown
+      </button>
+      <button onclick="refreshAll()" class="ml-auto px-3 py-2 rounded-lg text-xs bg-slate-700 hover:bg-slate-600 text-slate-200">
+        🔄 Refresh Data
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="max-w-7xl mx-auto p-4">
+
+    <!-- ALERT BANNER -->
+    <div id="toast" class="hidden mb-4 p-3 rounded-lg font-medium text-sm"></div>
+
+    <!-- ==========================================
+         TAB 1: MEAT POS & M-PESA QUEUE
+    =========================================== -->
+    <section id="view-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Left 2 Cols: One-Tap Preset Buttons + Custom Cut Input -->
+      <div class="lg:col-span-2 space-y-6">
+        
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <h2 class="text-sm font-bold uppercase text-amber-400 mb-3">Quick One-Tap Meat & Service Presets</h2>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <!-- Beef (Product ID 1) -->
+            <button onclick="addCartItem(1, 'Beef (200/- Cut)', 200, null)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
+              <div class="font-bold">Beef - 200 KES</div>
+              <div class="text-xs opacity-75">~0.235 kg @ 850/kg</div>
+            </button>
+            <button onclick="addCartItem(1, 'Beef (1/2 Kg)', null, 0.5)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
+              <div class="font-bold">Beef - 1/2 Kg</div>
+              <div class="text-xs opacity-75">425 KES</div>
+            </button>
+            <button onclick="addCartItem(1, 'Beef (1 Kg)', null, 1.0)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
+              <div class="font-bold">Beef - 1 Kg</div>
+              <div class="text-xs opacity-75">850 KES</div>
+            </button>
+
+            <!-- Mutton (Product ID 2) -->
+            <button onclick="addCartItem(2, 'Mutton (250/- Cut)', 250, null)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
+              <div class="font-bold">Mutton - 250 KES</div>
+              <div class="text-xs opacity-75">~0.263 kg @ 950/kg</div>
+            </button>
+            <button onclick="addCartItem(2, 'Mutton (1/2 Kg)', null, 0.5)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
+              <div class="font-bold">Mutton - 1/2 Kg</div>
+              <div class="text-xs opacity-75">475 KES</div>
+            </button>
+            <button onclick="addCartItem(2, 'Mutton (1 Kg)', null, 1.0)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
+              <div class="font-bold">Mutton - 1 Kg</div>
+              <div class="text-xs opacity-75">950 KES</div>
+            </button>
+
+            <!-- Liver (ID 3), Kidney (ID 4), Cooking Fee (ID 5) -->
+            <button onclick="addCartItem(3, 'Liver (200/- Cut)', 200, null)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
+              <div class="font-bold">Liver - 200 KES</div>
+              <div class="text-xs opacity-75">Offal Cut</div>
+            </button>
+            <button onclick="addCartItem(4, 'Kidney (200/- Cut)', 200, null)" class="p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-950 rounded-lg text-left transition">
+              <div class="font-bold">Kidney - 200 KES</div>
+              <div class="text-xs opacity-75">Offal Cut</div>
+            </button>
+            <button onclick="addCartItem(5, 'Eat-In Cooking Fee', 200, null)" class="p-3 bg-emerald-800/70 hover:bg-emerald-500 hover:text-slate-950 border border-emerald-600 rounded-lg text-left transition">
+              <div class="font-bold">+ Cooking Fee</div>
+              <div class="text-xs opacity-90">200 KES (100% Margin)</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom Scale / Arbitrary Price Builder -->
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <h2 class="text-sm font-bold uppercase text-slate-300 mb-3">Custom Cut (Enter either Weight OR Price)</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+            <div>
+              <label class="text-xs text-slate-400">Select Meat</label>
+              <select id="custom-prod" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm"></select>
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">By Price (KES)</label>
+              <input type="number" id="custom-price" placeholder="e.g. 350" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">OR By Weight (Kg)</label>
+              <input type="number" step="0.05" id="custom-weight" placeholder="e.g. 0.75" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+            </div>
+            <button onclick="addCustomCut()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 px-4 rounded-lg text-sm">
+              + Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Stock Levels -->
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <h2 class="text-sm font-bold uppercase text-slate-300 mb-3">Available Batch Inventory</h2>
+          <div id="stock-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm"></div>
+        </div>
+      </div>
+
+      <!-- Right 1 Col: Active Cart & M-Pesa Till Matching -->
+      <div class="space-y-6">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-sm font-bold uppercase text-amber-400">Active POS Cart</h2>
+            <button onclick="clearCart()" class="text-xs text-rose-400 hover:underline">Clear</button>
+          </div>
+          <div id="cart-list" class="space-y-2 text-sm min-h-[100px] border-b border-slate-700 pb-3">
+            <p class="text-slate-500 text-xs italic">Tap items on the left to add...</p>
+          </div>
+          <div class="flex justify-between items-center py-3 text-lg font-bold">
+            <span>Total Due:</span>
+            <span id="cart-total" class="text-amber-400">0 KES</span>
+          </div>
+
+          <div class="space-y-2">
+            <button onclick="checkoutCart('CASH')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-lg text-sm">
+              💵 Complete Sale (CASH)
+            </button>
+            <button onclick="checkoutCart('MPESA_MEAT_TILL')" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm">
+              📱 Complete Sale (Direct Meat M-Pesa)
+            </button>
+          </div>
+        </div>
+
+        <!-- Unmatched M-Pesa Meat Till Webhook Queue -->
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="text-xs font-bold uppercase text-sky-400">Incoming Meat Till M-Pesa Queue</h2>
+            <button onclick="simulateMpesa('MEAT')" class="text-[11px] bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded">
+              + Simulate Customer Till Payment
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-400 mb-3">Tap a received payment below to link & close the active cart:</p>
+          <div id="mpesa-queue" class="space-y-2 text-xs"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 2: END-OF-DAY SNACK RECONCILIATION
+    =========================================== -->
+    <section id="view-snacks" class="hidden space-y-6">
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-amber-400">End-of-Day Snack Count (Zero-Logging Bypass)</h2>
+            <p class="text-xs text-slate-400">Enter morning opening count and evening remaining count. System calculates total sold, subtracts Snack Till M-Pesa, and shows required Cash.</p>
+          </div>
+          <button onclick="simulateMpesa('SNACK')" class="text-xs bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-2 rounded-lg">
+            📱 Simulate Snack Till M-Pesa (+150 KES)
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="border-b border-slate-700 text-slate-400 text-xs uppercase">
+                <th class="py-2">Snack Item</th>
+                <th class="py-2">Selling Price</th>
+                <th class="py-2">Opening Stock</th>
+                <th class="py-2">Added Today</th>
+                <th class="py-2">Closing Left</th>
+                <th class="py-2">Spoiled / Wastage</th>
+                <th class="py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody id="snack-recon-rows" class="divide-y divide-slate-700/60"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 3: LOG STOCK BATCHES, SAMOSAS & BILLS
+    =========================================== -->
+    <section id="view-stock" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- 1. Meat Carcass / Smokies / Sausages Batch Purchase -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+        <h3 class="font-bold text-amber-400 text-sm uppercase">1. Buy Meat Carcass or Snack Packets (Adds to Stock)</h3>
+        <div>
+          <label class="text-xs text-slate-400">Product</label>
+          <select id="batch-prod" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-400">Raw Qty (Kg or Pieces)</label>
+            <input type="number" id="batch-qty" placeholder="e.g. 50" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Bone/Shrinkage % (Meat=5, Snacks=0)</label>
+            <input type="number" id="batch-shrink" value="5" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-400">Total Cost Paid (KES)</label>
+            <input type="number" id="batch-cost" placeholder="e.g. 30000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Paid Via</label>
+            <select id="batch-via" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
+              <option value="CASH">Cash</option>
+              <option value="MPESA_MEAT_TILL">Meat M-Pesa Till</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="submitStockBatch()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm">
+          Save Inventory Batch
+        </button>
+      </div>
+
+      <!-- 2. In-House Samosa Folding Run -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+        <h3 class="font-bold text-emerald-400 text-sm uppercase">2. In-House Samosa Production Batch</h3>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-xs text-slate-400">Minced Meat (KES)</label>
+            <input type="number" id="sam-meat" placeholder="1000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Flour (KES)</label>
+            <input type="number" id="sam-flour" placeholder="300" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Onions/Spices (KES)</label>
+            <input type="number" id="sam-onion" placeholder="200" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">Total Samosa Pieces Folded from Batch</label>
+          <input type="number" id="sam-pcs" placeholder="e.g. 100" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+        </div>
+        <button onclick="submitSamosaRun()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm">
+          Log Samosa Batch & Add to Stock
+        </button>
+      </div>
+
+      <!-- 3. Amortized Consumables (Oil, Gas, Potatoes) -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+        <h3 class="font-bold text-sky-400 text-sm uppercase">3. Log Oil, Gas, or Potatoes (Spread Over Days)</h3>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-xs text-slate-400">Item</label>
+            <select id="con-name" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
+              <option value="Cooking Oil">Cooking Oil</option>
+              <option value="LPG Gas">LPG Gas</option>
+              <option value="Potatoes">Potatoes</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Total Cost (KES)</label>
+            <input type="number" id="con-cost" placeholder="4200" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Est. Days Lasting</label>
+            <input type="number" id="con-days" value="7" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          </div>
+        </div>
+        <button onclick="submitConsumable()" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm">
+          Start Daily Amortization Cycle
+        </button>
+      </div>
+
+      <!-- 4. Monthly Rent & Electricity Overhead Config -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+        <h3 class="font-bold text-purple-400 text-sm uppercase">4. Monthly Rent & Electricity Budget</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-400">Monthly Rent (KES)</label>
+            <input type="number" id="ov-rent" value="25000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Monthly Electricity (KES)</label>
+            <input type="number" id="ov-elec" value="5000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" />
+          </div>
+        </div>
+        <button onclick="submitOverheads()" class="w-full bg-purple-500 hover:bg-purple-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm">
+          Set Daily Overhead Share
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 4: FULL DAILY P&L & CASH FLOW REPORT
+    =========================================== -->
+    <section id="view-pnl" class="hidden">
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-3xl mx-auto space-y-4">
+        <h2 class="text-lg font-bold text-amber-400 border-b border-slate-700 pb-2">Today's Complete Accounting Statement</h2>
+        <div id="pnl-details" class="space-y-3 text-sm"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const API_BASE = 'http://localhost:3001/api';
+    let products = [];
+    let cart = [];
+
+    function showToast(msg, isError = false) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = `mb-4 p-3 rounded-lg font-medium text-sm ${
+        isError ? 'bg-rose-900/80 border border-rose-500 text-rose-100' : 'bg-emerald-900/80 border border-emerald-500 text-emerald-100'
+      }`;
+      setTimeout(() => el.classList.add('hidden'), 4500);
+    }
+
+    function switchTab(tab) {
+      ['pos', 'snacks', 'stock', 'pnl'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700';
+      });
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-amber-500 text-slate-950';
+    }
+
+    async function loadProducts() {
+      const res = await fetch(`${API_BASE}/products`);
+      const data = await res.json();
+      products = data.products || [];
+      document.getElementById('conn-status').textContent = `🟢 Connected to Backend (${API_BASE}) — ${products.length} products active`;
+
+      // Render Stock Cards
+      const stockGrid = document.getElementById('stock-grid');
+      stockGrid.innerHTML = products.filter(p => p.unit !== 'SERVICE').map(p => `
+        <div class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg">
+          <div class="font-bold text-slate-200">${p.name}</div>
+          <div class="text-xs text-slate-400">Price: ${Number(p.selling_price)}/${p.unit}</div>
+          <div class="text-sm font-bold mt-1 ${Number(p.current_stock) > 0 ? 'text-emerald-400' : 'text-rose-400'}">
+            Stock: ${Number(p.current_stock).toFixed(2)} ${p.unit}
+          </div>
+        </div>
+      `).join('');
+
+      // Populate Dropdowns
+      const meatOpts = products.filter(p => p.category === 'MEAT' && p.unit === 'KG').map(p => `<option value="${p.id}">${p.name} (${p.selling_price}/kg)</option>`).join('');
+      document.getElementById('custom-prod').innerHTML = meatOpts;
+
+      const batchOpts = products.filter(p => p.unit !== 'SERVICE').map(p => `<option value="${p.id}">${p.name} (${p.unit})</option>`).join('');
+      document.getElementById('batch-prod').innerHTML = batchOpts;
+
+      // Render EOD Snack Reconciliation Table
+      const snackRows = products.filter(p => p.is_reconciled_eod).map(p => `
+        <tr>
+          <td class="py-3 font-bold text-amber-300">${p.name}</td>
+          <td class="py-3">${Number(p.selling_price)} KES</td>
+          <td class="py-3"><input type="number" id="open-${p.id}" value="${Math.round(Number(p.current_stock))}" class="w-20 bg-slate-900 border border-slate-700 rounded p-1.5 text-center" /></td>
+          <td class="py-3"><input type="number" id="add-${p.id}" value="0" class="w-20 bg-slate-900 border border-slate-700 rounded p-1.5 text-center" /></td>
+          <td class="py-3"><input type="number" id="close-${p.id}" value="0" class="w-20 bg-slate-900 border border-slate-700 rounded p-1.5 text-center" /></td>
+          <td class="py-3"><input type="number" id="waste-${p.id}" value="0" class="w-20 bg-slate-900 border border-slate-700 rounded p-1.5 text-center" /></td>
+          <td class="py-3">
+            <button onclick="reconcileSnack(${p.id})" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-3 py-1.5 rounded text-xs">
+              Save Count
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('snack-recon-rows').innerHTML = snackRows;
+    }
+
+    async function loadDashboard() {
+      const res = await fetch(`${API_BASE}/dashboard/today`);
+      const d = await res.json();
+
+      document.getElementById('stat-rev').textContent = `${Number(d.total_daily_revenue || 0).toLocaleString()} KES`;
+      document.getElementById('stat-profit').textContent = `${Number(d.true_daily_net_profit || 0).toLocaleString()} KES`;
+      document.getElementById('stat-cashflow').textContent = `${Number(d.net_cash_flow_today || 0).toLocaleString()} KES`;
+      document.getElementById('stat-snack-cash').textContent = `${Number(d.implied_snack_cash_rev || 0).toLocaleString()} KES`;
+
+      document.getElementById('pnl-details').innerHTML = `
+        <div class="flex justify-between py-1"><span>Meat & Cooking Fee Revenue:</span><span class="font-bold">${Number(d.meat_and_cooking_rev || 0).toLocaleString()} KES</span></div>
+        <div class="flex justify-between py-1"><span>Reconciled Snack Revenue:</span><span class="font-bold">${Number(d.snack_rev || 0).toLocaleString()} KES</span></div>
+        <div class="flex justify-between py-1 text-xs text-slate-400 pl-4"><span>↳ Paid via Snack M-Pesa Till:</span><span>${Number(d.snack_mpesa_rev || 0).toLocaleString()} KES</span></div>
+        <div class="flex justify-between py-1 text-xs text-amber-300 pl-4"><span>↳ Expected Physical Cash from Snacks:</span><span>${Number(d.implied_snack_cash_rev || 0).toLocaleString()} KES</span></div>
+        <hr class="border-slate-700"/>
+        <div class="flex justify-between py-1 text-rose-300"><span>(-) Meat FIFO COGS (Cost of Meat Sold Today):</span><span>-${Number(d.meat_cogs || 0).toLocaleString()} KES</span></div>
+        <div class="flex justify-between py-1 text-rose-300"><span>(-) Snack COGS (Including Spoilage):</span><span>-${Number(d.snack_cogs || 0).toLocaleString()} KES</span></div>
+        <div class="flex justify-between py-1 text-rose-300"><span>(-) Today's Share of Oil, Gas & Potatoes:</span><span>-${Number(d.oil_gas_potatoes_amortized || 0).toLocaleString()} KES</span></div>
+        <div class="flex justify-between py-1 text-rose-300"><span>(-) Today's Share of Rent & Electricity:</span><span>-${Number(d.daily_rent_electricity_share || 0).toLocaleString()} KES</span></div>
+        <hr class="border-slate-700"/>
+        <div class="flex justify-between py-2 text-base font-bold text-emerald-400"><span>= TRUE DAILY NET PROFIT:</span><span>${Number(d.true_daily_net_profit || 0).toLocaleString()} KES</span></div>
+        <div class="flex justify-between py-2 text-sm font-bold text-sky-400 border-t border-slate-700"><span>Actual Cash/M-Pesa Outflows Today (Stock/Bills Bought):</span><span>-${Number(d.actual_money_spent_today || 0).toLocaleString()} KES</span></div>
+        <div class="flex justify-between py-1 text-base font-bold text-sky-300"><span>= NET CASH FLOW TODAY:</span><span>${Number(d.net_cash_flow_today || 0).toLocaleString()} KES</span></div>
+      `;
+    }
+
+    async function loadMpesaQueue() {
+      const res = await fetch(`${API_BASE}/mpesa/unmatched-meat`);
+      const list = await res.json();
+      const container = document.getElementById('mpesa-queue');
+      if (!list.length) {
+        container.innerHTML = `<p class="text-slate-500 italic">No unmatched Meat Till payments right now.</p>`;
+        return;
+      }
+      container.innerHTML = list.map(tx => `
+        <div class="flex justify-between items-center bg-slate-900 border border-sky-800 p-2 rounded-lg">
+          <div>
+            <div class="font-bold text-sky-300">${Number(tx.amount)} KES — ${tx.customer_name || 'Customer'}</div>
+            <div class="text-[10px] text-slate-400">Receipt: ${tx.mpesa_receipt}</div>
+          </div>
+          <button onclick="checkoutCart('MPESA_MEAT_TILL', '${tx.mpesa_receipt}', ${Number(tx.amount)})" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-2.5 py-1 rounded text-xs">
+            Link to Cart
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // CART LOGIC
+    function addCartItem(product_id, label, revenue_amount, weight_kg) {
+      const prod = products.find(p => p.id === product_id);
+      const rev = revenue_amount ? Number(revenue_amount) : Number((weight_kg * Number(prod?.selling_price || 850)).toFixed(2));
+      cart.push({ product_id, label, revenue_amount: rev, weight_kg });
+      renderCart();
+    }
+
+    function addCustomCut() {
+      const prodId = Number(document.getElementById('custom-prod').value);
+      const priceVal = document.getElementById('custom-price').value;
+      const weightVal = document.getElementById('custom-weight').value;
+      const prod = products.find(p => p.id === prodId);
+
+      if (!priceVal && !weightVal) return showToast('Enter either a Price (KES) or Weight (Kg)', true);
+
+      if (priceVal) {
+        addCartItem(prodId, `${prod.name} (${priceVal}/- Cut)`, Number(priceVal), null);
+      } else {
+        addCartItem(prodId, `${prod.name} (${weightVal} Kg)`, null, Number(weightVal));
+      }
+      document.getElementById('custom-price').value = '';
+      document.getElementById('custom-weight').value = '';
+    }
+
+    function clearCart() {
+      cart = [];
+      renderCart();
+    }
+
+    function renderCart() {
+      const list = document.getElementById('cart-list');
+      if (!cart.length) {
+        list.innerHTML = `<p class="text-slate-500 text-xs italic">Tap items on the left to add...</p>`;
+        document.getElementById('cart-total').textContent = '0 KES';
+        return;
+      }
+      const total = cart.reduce((s, i) => s + i.revenue_amount, 0);
+      list.innerHTML = cart.map((item, idx) => `
+        <div class="flex justify-between items-center bg-slate-900 px-2.5 py-1.5 rounded">
+          <span>${item.label}</span>
+          <span class="font-bold text-amber-300">${item.revenue_amount} KES</span>
+        </div>
+      `).join('');
+      document.getElementById('cart-total').textContent = `${total.toLocaleString()} KES`;
+    }
+
+    async function checkoutCart(payment_type, mpesa_receipt = null, overrideAmount = null) {
+      if (!cart.length) return showToast('Your POS cart is empty!', true);
+      const total = overrideAmount || cart.reduce((s, i) => s + i.revenue_amount, 0);
+
+      const res = await fetch(`${API_BASE}/pos/sale`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart,
+          payments: [{ payment_type, amount: total, mpesa_receipt }]
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error || 'Sale failed', true);
+
+      showToast(`✅ Sale recorded (${total} KES via ${payment_type})!`);
+      clearCart();
+      refreshAll();
+    }
+
+    // EOD SNACK RECONCILIATION
+    async function reconcileSnack(product_id) {
+      const opening_stock = Number(document.getElementById(`open-${product_id}`).value);
+      const added_stock = Number(document.getElementById(`add-${product_id}`).value);
+      const closing_stock = Number(document.getElementById(`close-${product_id}`).value);
+      const wastage_or_spoiled = Number(document.getElementById(`waste-${product_id}`).value);
+
+      const res = await fetch(`${API_BASE}/snacks/reconcile`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id, opening_stock, added_stock, closing_stock, wastage_or_spoiled })
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error || 'Reconciliation error', true);
+
+      showToast(`✅ ${data.message} — Sold: ${data.reconciliation.units_sold} pcs (${data.reconciliation.total_revenue} KES)`);
+      refreshAll();
+    }
+
+    // STOCK, SAMOSA, CONSUMABLE & OVERHEAD FORMS
+    async function submitStockBatch() {
+      const product_id = Number(document.getElementById('batch-prod').value);
+      const raw_quantity = Number(document.getElementById('batch-qty').value);
+      const shrinkage_pct = Number(document.getElementById('batch-shrink').value);
+      const total_batch_cost = Number(document.getElementById('batch-cost').value);
+      const paid_via = document.getElementById('batch-via').value;
+
+      if (!raw_quantity || !total_batch_cost) return showToast('Enter quantity and total cost', true);
+
+      const res = await fetch(`${API_BASE}/batches`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id, raw_quantity, shrinkage_pct, total_batch_cost, paid_via })
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error, true);
+      showToast(`✅ Batch logged! Unit Cost: ${data.batch.unit_cost} KES`);
+      refreshAll();
+    }
+
+    async function submitSamosaRun() {
+      const minced_meat_cost = Number(document.getElementById('sam-meat').value);
+      const flour_cost = Number(document.getElementById('sam-flour').value);
+      const onions_spices_cost = Number(document.getElementById('sam-onion').value);
+      const pieces_folded = Number(document.getElementById('sam-pcs').value);
+
+      if (!pieces_folded) return showToast('Enter number of samosas folded', true);
+
+      const res = await fetch(`${API_BASE}/samosa-production`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ minced_meat_cost, flour_cost, onions_spices_cost, pieces_folded, paid_via: 'CASH' })
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error, true);
+      showToast(`✅ Folded ${pieces_folded} Samosas! Cost per samosa: ${data.production_run.cost_per_samosa} KES`);
+      refreshAll();
+    }
+
+    async function submitConsumable() {
+      const item_name = document.getElementById('con-name').value;
+      const total_cost = Number(document.getElementById('con-cost').value);
+      const expected_days = Number(document.getElementById('con-days').value);
+      if (!total_cost) return showToast('Enter total cost', true);
+
+      const res = await fetch(`${API_BASE}/consumables`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_name, total_cost, expected_days, paid_via: 'CASH' })
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error, true);
+      showToast(`✅ ${item_name} amortized at ${data.consumable.daily_amortized_cost} KES/day!`);
+      refreshAll();
+    }
+
+    async function submitOverheads() {
+      const rent_budget = Number(document.getElementById('ov-rent').value);
+      const electricity_budget = Number(document.getElementById('ov-elec').value);
+      const month_year = new Date().toISOString().slice(0, 7) + '-01';
+
+      const res = await fetch(`${API_BASE}/overheads/config`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ month_year, rent_budget, electricity_budget, days_in_month: 30 })
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error, true);
+      showToast(`✅ Monthly overheads set (${data.config.daily_overhead_charge} KES/day)!`);
+      refreshAll();
+    }
+
+    // SIMULATE DARAJA C2B WEBHOOK
+    async function simulateMpesa(type) {
+      const receipt = 'SJK' + Math.floor(100000 + Math.random() * 900000);
+      const amount = type === 'SNACK' ? 150 : (cart.reduce((s, i) => s + i.revenue_amount, 0) || 400);
+      await fetch(`${API_BASE}/mpesa/c2b-confirmation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          TransID: receipt,
+          TransAmount: amount,
+          BusinessShortCode: type === 'SNACK' ? (window.SNACK_TILL || '999999') : '111111',
+          MSISDN: '254712345678',
+          FirstName: 'JOHN',
+          LastName: 'KAMAU'
+        })
+      });
+      showToast(`📲 Simulated ${type} M-Pesa Till Webhook: ${amount} KES (Receipt: ${receipt})`);
+      refreshAll();
+    }
+
+    function refreshAll() {
+      loadProducts();
+      loadDashboard();
+      loadMpesaQueue();
+    }
+
+    refreshAll();
+  </script>
+</body>
+</html>
