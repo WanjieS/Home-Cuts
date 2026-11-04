@@ -23,8 +23,9 @@ const DARAJA_BASE_URL = ENV_MODE === 'production'
   ? 'https://api.safaricom.co.ke' 
   : 'https://sandbox.safaricom.co.ke';
 
-const CONFIRMATION_URL = process.env.MPESA_CONFIRMATION_URL || 'https://home-cuts.onrender.com/api/mpesa/c2b-confirmation';
-const VALIDATION_URL = process.env.MPESA_VALIDATION_URL || 'https://home-cuts.onrender.com/api/mpesa/c2b-validation';
+// IMPORTANT: Safaricom blocks URLs containing "mpesa" or "c2b". Use /api/payments/confirm
+const CONFIRMATION_URL = process.env.MPESA_CONFIRMATION_URL || 'https://home-cuts.onrender.com/api/payments/confirm';
+const VALIDATION_URL = process.env.MPESA_VALIDATION_URL || 'https://home-cuts.onrender.com/api/payments/validate';
 
 const TILLS = [
   { name: 'Meat Till', shortCode: process.env.MPESA_MEAT_TILL || '201039' },
@@ -52,13 +53,15 @@ async function registerTill(accessToken, till) {
   console.log(`   ValidationURL:   ${VALIDATION_URL}`);
 
   const payload = {
-    ShortCode: till.shortCode,
+    ShortCode: String(till.shortCode),
     ResponseType: 'Completed',
     ConfirmationURL: CONFIRMATION_URL,
     ValidationURL: VALIDATION_URL
   };
 
-  const res = await fetch(`${DARAJA_BASE_URL}/mpesa/c2b/v1/registerurl`, {
+  // Production Daraja uses v2; Sandbox supports v1/v2
+  const version = ENV_MODE === 'production' ? 'v2' : 'v1';
+  const res = await fetch(`${DARAJA_BASE_URL}/mpesa/c2b/${version}/registerurl`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -68,7 +71,7 @@ async function registerTill(accessToken, till) {
   });
 
   const data = await res.json();
-  if (!res.ok) {
+  if (!res.ok || data.errorCode) {
     console.error(`❌ Failed to register ${till.name}:`, data);
   } else {
     console.log(`✅ ${till.name} registered successfully! Response:`, data);
@@ -78,21 +81,15 @@ async function registerTill(accessToken, till) {
 async function main() {
   try {
     console.log(`🚀 Starting Safaricom Daraja URL Registration [Mode: ${ENV_MODE.toUpperCase()}]`);
-    console.log(`📡 Target Render Host: ${CONFIRMATION_URL}`);
     const token = await getAccessToken();
     console.log(`🔑 Obtained Daraja Access Token successfully.`);
 
     for (const till of TILLS) {
       await registerTill(token, till);
     }
-
-    console.log(`\n🎉 Done! Safaricom will now post all incoming C2B payments to Render.`);
   } catch (err) {
     console.error('\n⚠️ Registration error:', err.message);
-    console.log('\nTip: If you do not have Daraja API keys and are using a physical Till phone, you can forward payments using an Android SMS Webhook app pointed to:');
-    console.log(`   ${CONFIRMATION_URL}`);
   }
 }
 
 main();
-
