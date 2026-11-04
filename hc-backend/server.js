@@ -65,7 +65,7 @@ app.post('/api/batches', async (req, res) => {
     );
 
     await client.query('COMMIT');
-    res.json({ message: 'Stock batch logged successfully', batch: batchRes.rows[0] });
+    res.json({ message: 'New stock added successfully', batch: batchRes.rows[0] });
   } catch (err) {
     await client.query('ROLLBACK');
     res.status(500).json({ error: err.message });
@@ -86,7 +86,7 @@ app.post('/api/samosa-production', async (req, res) => {
 
     // Find Samosa product_id
     const prodRes = await client.query(`SELECT id FROM products WHERE name = 'Samosa' LIMIT 1`);
-    if (prodRes.rows.length === 0) throw new Error("Samosa product not found in database.");
+    if (prodRes.rows.length === 0) throw new Error("Samosa is not set up in the system.");
     const samosaProductId = prodRes.rows[0].id;
 
     const totalCost = Number(minced_meat_cost || 0) + Number(flour_cost || 0) + Number(onions_spices_cost || 0);
@@ -114,7 +114,7 @@ app.post('/api/samosa-production', async (req, res) => {
     );
 
     await client.query('COMMIT');
-    res.json({ message: 'Samosa batch created', production_run: runRes.rows[0], batch: batchRes.rows[0] });
+    res.json({ message: 'Samosa batch saved successfully', production_run: runRes.rows[0], batch: batchRes.rows[0] });
   } catch (err) {
     await client.query('ROLLBACK');
     res.status(500).json({ error: err.message });
@@ -156,7 +156,7 @@ app.post('/api/consumables', async (req, res) => {
     );
 
     await client.query('COMMIT');
-    res.json({ message: 'Consumable logged & amortized', consumable: cycleRes.rows[0] });
+    res.json({ message: 'Item cost saved and spread across days', consumable: cycleRes.rows[0] });
   } catch (err) {
     await client.query('ROLLBACK');
     res.status(500).json({ error: err.message });
@@ -177,7 +177,7 @@ app.post('/api/overheads/config', async (req, res) => {
        RETURNING *`,
       [month_year, rent_budget, electricity_budget, days_in_month || 30]
     );
-    res.json({ message: 'Monthly overhead configured', config: result.rows[0] });
+    res.json({ message: 'Monthly rent and electricity budget saved', config: result.rows[0] });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -257,7 +257,7 @@ app.post('/api/pos/sale', async (req, res) => {
       }
 
       if (remainingToFulfill > 0) {
-        throw new Error(`Insufficient stock in batches for ${product.name}. Short by ${remainingToFulfill} ${product.unit}`);
+        throw new Error(`Not enough ${product.name} in stock right now. You are short by ${remainingToFulfill} ${product.unit}. Please add new stock first.`);
       }
     }
 
@@ -278,7 +278,7 @@ app.post('/api/pos/sale', async (req, res) => {
     }
 
     await client.query('COMMIT');
-    res.json({ message: 'POS Sale recorded with FIFO COGS', order_id: orderId });
+    res.json({ message: 'Sale recorded successfully', order_id: orderId });
   } catch (err) {
     await client.query('ROLLBACK');
     res.status(400).json({ error: err.message });
@@ -328,7 +328,7 @@ app.post('/api/snacks/reconcile', async (req, res) => {
     }
 
     await client.query('COMMIT');
-    res.json({ message: `${product.name} reconciled for today`, reconciliation: reconRes.rows[0] });
+    res.json({ message: `${product.name} daily count saved`, reconciliation: reconRes.rows[0] });
   } catch (err) {
     await client.query('ROLLBACK');
     res.status(400).json({ error: err.message });
